@@ -32,6 +32,10 @@ streamlit run dashboard_app.py
 
 如需重新计算预测，可运行 `python demand_forecaster.py`；该脚本会遍历产品—地点组合训练模型，数据量较大时耗时较长。重新生成预测后，可运行 `python inventory_optimizer.py` 更新库存指标，再启动仪表板。仅浏览仓库预计算结果时，直接启动仪表板即可。
 
+## 本次轻量复现范围
+
+使用与项目字段结构一致的隔离样例 CSV 运行上游 `dashboard_app.py`，通过 Streamlit AppTest 验证需求预测、库存管理、供应商分析三个页面及 17 项指标可正常渲染，未出现应用异常。此次验证没有载入完整上游 CSV，也没有重算 Prophet 模型，因此只证明样例数据下的页面与指标链路可运行，不代表完整数据集或生产效果。
+
 ## 局限
 
 - 示例数据为模拟数据，适合学习指标关系和交互方式，不能代表真实企业业务表现。
@@ -45,4 +49,5 @@ streamlit run dashboard_app.py
 - 上游项目：[akeDataAnalyst/Supply-Chain-Dashboard](https://github.com/akeDataAnalyst/Supply-Chain-Dashboard)
 - 原作者：Aklilu Abera
 - 许可：MIT，详见本仓库 [`LICENSE`](LICENSE)。分发或改作时应保留原版权和许可声明。
+
 
