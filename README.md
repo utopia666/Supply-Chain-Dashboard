@@ -1,43 +1,48 @@
-# Supply Chain Analytics Dashboard
+# Supply Chain Analytics Dashboard｜供应链分析仪表板
 
-[![Live Demo](https://img.shields.io/badge/Streamlit-Live%20Demo-brightgreen)](https://supply-chain-dashboard-fppecphmqqsatcchdwfqxy.streamlit.app)
+> 本仓库源自 [akeDataAnalyst/Supply-Chain-Dashboard](https://github.com/akeDataAnalyst/Supply-Chain-Dashboard)，原作者为 **Aklilu Abera**。项目代码和原始 `LICENSE` 保留上游 MIT 许可及署名。本次整理用于开源项目研习与轻量复现，不将上游代码或方法表述为原创。
 
----
+[在线演示](https://supply-chain-dashboard-fppecphmqqsatcchdwfqxy.streamlit.app)
 
-## Project Overview
+## 项目简介
 
-An interactive dashboard for analyzing supply chain operations through demand forecasting, inventory management, and supplier performance analysis.
+项目使用 Python、Pandas、Prophet、Streamlit 和 Plotly，将模拟的需求、采购、库存及供应商数据组织成可交互的供应链分析仪表板。页面按需求预测、库存管理、供应商分析分为三个区域，可按产品、地点、日期和供应商筛选。
 
-The dashboard helps users explore historical demand, forecast future requirements, assess stock levels, and compare supplier performance. It uses simulated data to demonstrate the analytical workflow and dashboard functionality.
+## 业务流程与指标
 
----
+| 主题 | 页面展示与计算 | 可以辅助观察 |
+| --- | --- | --- |
+| 供应链计划 / 需求预测 | 按产品—地点组合使用 Prophet 生成未来 90 天预测；以最近 30 天数据作验证，展示 MAE、RMSE、MAPE 和预测区间 | 需求趋势、预测误差与后续备货参考。MAPE 计算时跳过实际需求为 0 的记录 |
+| 采购订单 | 查看订单数、供应商、产品、地点、订单/交付日期、订购数量和单价，并可按供应商筛选 | 订单执行和采购明细；当前页面未汇总采购金额、价格差异或节约额 |
+| 库存与补货 | 展示当前库存、日均需求、平均提前期、安全库存、再订货点、建议订货量及库存状态 | 缺货、低于安全库存、需补货、潜在积压等 SKU—地点组合 |
+| 供应商绩效 | 展示采购订单数、准时交付率和实际平均交期 | 供应商交付表现及筛选后的订单明细 |
 
-## Key Features
+库存计算采用简化规则：安全库存约为 `Z × 日需求标准差 × √提前期`，再订货点约为 `日均需求 × 提前期 + 安全库存`；补货量优先取未来 30 天预测需求合计。当前实现按全部供应商的平均提前期计算，并对无预测量的情形使用简化回退值。
 
-* **Demand Forecasting:** Visualize historical demand and forecast future requirements using time-series models, with forecast accuracy metrics.
+## 本地运行
 
-* ![](png/demand_trend\&forecast.PNG)
+完整仓库包含示例 CSV 和预计算结果。准备 Python 环境后，在仓库根目录运行：
 
-* **Inventory Management:** Monitor stock levels and calculate safety stock, reorder points, and reorder quantities.
+```powershell
+py -3.10 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+streamlit run dashboard_app.py
+```
 
-* **Supplier Analytics:** Analyze supplier performance using indicators such as on-time delivery rates and average lead times.
+如需重新计算预测，可运行 `python demand_forecaster.py`；该脚本会遍历产品—地点组合训练模型，数据量较大时耗时较长。重新生成预测后，可运行 `python inventory_optimizer.py` 更新库存指标，再启动仪表板。仅浏览仓库预计算结果时，直接启动仪表板即可。
 
-* **Interactive Filters:** Explore results by product, location, supplier, and custom date ranges.
+## 局限
 
-* ![](png/stock_reorder_safety.PNG)
+- 示例数据为模拟数据，适合学习指标关系和交互方式，不能代表真实企业业务表现。
+- 当前采购页没有采购金额、预算执行、价格趋势、MOQ 或降本指标；供应商分析也没有完整的质量、成本、风险或加权评分模型。
+- 提前期使用供应商整体平均值，未细分到供应商—物料—地点；库存规则未纳入采购批量、产能、资金、保质期及需求相关性等约束。
+- 预测使用历史销量和 Prophet 季节性设定，未接入促销、价格、计划变更等外部变量；预测准确率依赖样例数据及其验证切分。
+- 仪表板读取本地 CSV，没有连接 ERP、采购或仓储系统，也不自动刷新数据。
 
----
+## 来源与许可
 
-## Technology Stack
+- 上游项目：[akeDataAnalyst/Supply-Chain-Dashboard](https://github.com/akeDataAnalyst/Supply-Chain-Dashboard)
+- 原作者：Aklilu Abera
+- 许可：MIT，详见本仓库 [`LICENSE`](LICENSE)。分发或改作时应保留原版权和许可声明。
 
-* **Python:** Core programming and analysis
-* **Pandas:** Data manipulation and analysis
-* **Prophet:** Time-series forecasting
-* **Streamlit:** Interactive dashboard development
-* **Plotly:** Data visualization
-
----
-
-## Developed by
-
-**Aklilu Abera** | **Data Analyst**
