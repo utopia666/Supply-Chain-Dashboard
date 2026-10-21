@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="SupplyFlow Lab：基于开源项目改进的供应链课程设计，采购分析、供应商交付评价与补货情景模拟。">
+  <title>SupplyFlow Lab · 供应链运营与补货决策</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23125951'/%3E%3Cpath d='M10 12h20M10 20h14M10 28h20' stroke='white' stroke-width='4'/%3E%3C/svg%3E">
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="#overview"><span class="logo">F</span><span>SupplyFlow <b>Lab</b><small>供应链决策实验室</small></span></a>
+  <div class="nav-label">工作台 / WORKSPACE</div>
+  <nav aria-label="功能导航">
+    <button class="nav active" data-view="overview" aria-current="page"><span>◫</span>运营总览</button>
+    <button class="nav" data-view="planning"><span>≋</span>补货决策</button>
+    <button class="nav" data-view="suppliers"><span>◇</span>供应商分析</button>
+    <button class="nav" data-view="about"><span>ⓘ</span>项目说明</button>
+  </nav>
+  <div class="sidebar-note"><span class="dot"></span>供应链课程设计<br><a href="https://github.com/utopia666/SupplyFlow-Lab" target="_blank" rel="noopener">查看 GitHub 源码 ↗</a></div>
+  <div class="attribution">MIT · Aklilu Abera / 开源改进</div>
+</aside>
+<main>
+  <header class="topbar"><span>供应链运营 / <b id="crumb">运营总览</b></span><span class="pill">模拟数据演示</span></header>
+  <div class="content">
+    <div class="heading"><div><div class="eyebrow">SUPPLY CHAIN OPERATIONS</div><h1 id="title">供应链运营总览</h1><p id="subtitle">采购 · 库存 · 交付</p></div><div class="snapshot">数据快照<span id="asof">加载中…</span></div></div>
+    <div id="loading" role="status">正在读取供应链演示数据…</div>
+    <div id="application" hidden>
+      <section class="filters" aria-label="分析范围">
+        <label>仓库 / 网点<select id="location"><option value="">全部网点</option></select></label>
+        <label>产品品类<select id="category"><option value="">全部品类</option></select></label>
+        <label id="period-label">采购订单期间<select id="period"><option value="">全年</option><option value="1">第一季度</option><option value="2">第二季度</option><option value="3">第三季度</option><option value="4">第四季度</option></select></label>
+        <button class="text-button" id="reset">重置筛选</button><span class="scope" id="scope"></span>
+      </section>
+      <section id="overview" class="view">
+        <div class="kpis" id="kpis"></div>
+        <div class="two-col">
+          <article class="panel"><div class="panel-head"><div><h2>采购金额趋势</h2><p>月度 · 原始货币单位</p></div><span class="tag" id="year"></span></div><div id="trend"></div></article>
+          <article class="panel"><div class="panel-head"><div><h2>采购结构</h2><p>品类金额占比</p></div><span class="muted">CATEGORY MIX</span></div><div id="categories"></div></article>
+        </div>
+        <article class="action-banner"><span class="action-icon">↗</span><div><h2 id="action-title"></h2><p id="action-text"></p></div><button class="primary" data-go="planning">查看补货计划 →</button></article>
+        <article class="panel"><div class="panel-head"><div><h2>优先关注的库存</h2><p>风险优先 · 默认情景</p></div><button class="text-button" data-go="planning">查看全部 →</button></div><div class="table-wrap" id="urgent-table"></div></article>
+      </section>
+      <section id="planning" class="view" hidden>
+        <article class="panel scenario"><div class="panel-head"><div><h2>补货情景模拟</h2></div><button id="scenario-reset" class="text-button">恢复默认</button></div>
+          <div class="scenario-fields">
+            <label>需求水平 <strong id="factor-value">100%</strong><input id="factor" type="range" min="50" max="150" step="5" value="100"></label>
+            <label>备货周期（天）<input id="review" type="number" min="0" max="90" value="30"></label>
+            <label>订货批量倍数（件）<input id="moq" type="number" min="1" max="10000" step="1" value="1"></label>
+          </div><p id="validation" role="alert"></p>
+        </article>
+        <div class="kpis" id="plan-kpis"></div>
+        
+        <article class="panel"><div class="panel-head wrap"><div><h2>补货建议清单</h2><p id="plan-count"></p></div><div class="tools"><input id="search" type="search" aria-label="搜索 SKU 或产品名称" placeholder="搜索 SKU / 产品名称"><select id="risk" aria-label="筛选风险"><option value="">全部风险</option><option value="1">缺货 / 交期内风险</option><option value="2">接近补货点</option><option value="3">覆盖充足</option></select><button class="primary" id="export">导出清单 ↓</button></div></div><div class="table-wrap" id="plan-table"></div><div class="pagination"><span id="page-status"></span><button id="previous">上一页</button><button id="next">下一页</button></div></article>
+      </section>
+      <section id="suppliers" class="view" hidden>
+        <div class="kpis" id="supplier-kpis"></div>
+        <article class="panel"><div class="panel-head wrap"><div><h2>供应商交付表现</h2><p>交付指标：快照日已完成订单</p></div><label class="inline-label">排序<select id="supplier-sort"><option value="spend">采购金额从高到低</option><option value="otd">准时交付率从低到高</option><option value="lead">实际交期从长到短</option></select></label></div><div class="table-wrap" id="supplier-table"></div></article>
+        
+      </section>
+      <section id="about" class="view" hidden>
+        <article class="panel prose"><span class="tag">COURSE PROJECT</span><h2>SupplyFlow Lab · 供应链运营与补货决策看板</h2><p>基于 <a href="https://github.com/akeDataAnalyst/Supply-Chain-Dashboard" target="_blank" rel="noopener">Aklilu Abera / Supply-Chain-Dashboard</a>（MIT）研习与改进。原作提供模拟业务数据、Prophet 需求预测、库存规则和 Streamlit 看板；本项目新增浏览器端决策工作台与情景计算，保留原作者署名及许可。</p>
+          <div class="improvements"><div><b>01 / 采购视角</b><p>从订单数量扩展到采购金额、品类结构和供应商金额集中度。</p></div><div><b>02 / 计划视角</b><p>加入库存覆盖天数、经验交期、在途量、备货周期和订货批量情景。</p></div><div><b>03 / 行动视角</b><p>风险排序、网点与品类筛选、可下载补货清单，以及公开免登录演示。</p></div></div>
+          <details><summary>指标口径</summary><ul><li>采购金额：订单数量 × 单价，不含税费和物流成本；源数据未注明币种。</li><li>准时交付率：已完成交付订单中的 on_time_delivery=True 数 / 已完成交付订单数。未根据缺失的承诺日期重新判断。</li><li>实际交期：已完成订单的交付日期 − 下单日期，按订单等权平均。</li><li>经验交期：各 SKU × 网点的历史已完成订单平均交期；缺失时采用原项目交期。</li><li>库存覆盖天数：在手库存 / 情景日均需求；无需求时记为不适用。</li><li>目标库存：情景日均需求 ×（经验交期 + 备货周期）+ 情景安全库存。安全库存按需求比例线性缩放，为简化假设。</li><li>预估补货金额：建议数量 × 产品主数据单位成本，为资金测算值，不是供应商报价。</li></ul></details>
+          <details><summary>数据与使用边界</summary><p>全部为上游生成的模拟数据。采购仅展示快照年度，库存为单日快照；采购期间筛选不会改变库存。模拟在途量依据快照日尚未交付的订单推导。没有预留库存、欠单、真实 MOQ、交付排程、仓容与预算约束，不能直接用于企业下单。</p><p>当前演示沿用原作历史日均需求，不宣称重新训练了预测模型，也未验证节省成本或提升效率。源数据中交付结果、库存与需求未必完全勾稽；本项目用于学习指标定义、发现问题和比较情景。</p></details>
+          <a class="primary link-button" href="https://github.com/utopia666/SupplyFlow-Lab" target="_blank" rel="noopener">阅读代码、运行方法与验证记录 ↗</a>
+        </article>
+      </section>
+    </div>
+    <footer>SupplyFlow Lab <span>课程设计 · 模拟数据 · 基于 MIT 开源项目改进</span><span id="data-note"></span></footer>
+  </div>
+</main>
+<script type="module" src="./app.mjs"></script>
+</body>
+</html>
